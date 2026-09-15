@@ -1,0 +1,4 @@
+# Keep the repository LF; Windows batch files need CRLF to run reliably.
+* text=auto eol=lf
+*.cmd text eol=crlf
+*.bat text eol=crlf
