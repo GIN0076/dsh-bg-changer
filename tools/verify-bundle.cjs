@@ -347,7 +347,7 @@ async function main() {
 
   check('surface tokens cover the base surfaces', internals.SURFACE_TOKENS.indexOf('--dsw-alias-bg-base') !== -1
     && internals.SURFACE_TOKENS.indexOf('--dsw-alias-bg-layer-2') !== -1
-    && internals.SURFACE_TOKENS.indexOf('--dsw-specific-sidebar-fill') !== -1)
+    && internals.SURFACE_TOKENS.indexOf('--dsw-alias-bg-mask-1') !== -1)
   check('base css keeps the app above the wallpaper', internals.BASE_CSS.indexOf('#root{position:relative;z-index:1') !== -1)
   check('base css clears the opaque body background', internals.BASE_CSS.indexOf('body{background:transparent !important}') !== -1)
 
@@ -400,7 +400,7 @@ async function main() {
   check('stylesheet clears the body background', styleText.indexOf('body{background:transparent !important}') !== -1)
   check('stylesheet lifts #root above the wallpaper', styleText.indexOf('#root{position:relative;z-index:1') !== -1)
   check('stylesheet emits surface overrides', styleText.indexOf('--dsw-alias-bg-base: rgba(21, 21, 23,') !== -1
-    && styleText.indexOf('--dsw-specific-sidebar-fill: rgba(21, 21, 23,') !== -1)
+    && styleText.indexOf('--dsw-alias-bg-mask-1: rgba(21, 21, 23,') !== -1)
   check('surface alpha follows the slider', styleText.indexOf('rgba(21, 21, 23, 0.6000)') !== -1)
 
   const rootProps = phase2.document.documentElement.style.properties

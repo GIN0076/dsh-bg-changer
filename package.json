@@ -1,6 +1,6 @@
 {
   "name": "dsh-bg-changer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "DeepSeek Harness background wallpaper plugin: upload an image and tune fit/scale/position/opacity/blur plus interface translucency, from a row at the bottom of Settings > General.",
   "type": "module",
