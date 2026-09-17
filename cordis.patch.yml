@@ -1,0 +1,10 @@
+# dsh-bg-changer profile patch: one loader row for this package.
+#
+# Third-party plugins register through `insert` only: the package's own
+# `dsh.bundle.patch` manifest field makes this file a profile layer, and
+# `dsh plugin --profile web add` appends the package name to
+# `dsh.profile.bundles`. Do not also list it there by hand (duplicate
+# loader entries fail boot).
+- insert:
+    - id: bg-changer
+      name: dsh-bg-changer
