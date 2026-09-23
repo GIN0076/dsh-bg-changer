@@ -19,7 +19,7 @@
 | 图片 | 点击 / 拖拽上传；支持 PNG、JPEG、WebP、GIF（动图保留动画）、BMP、AVIF、SVG；显示文件名、体积、格式、像素；更换 / 移除 |
 | 布局与裁剪 | **填充 / 适应 / 拉伸 / 平铺**；缩放 50–300%；水平、垂直偏移 −100…100；预览框内**拖拽平移 + 滚轮缩放**（与窗口同宽高比，所见即所得）；重置构图 |
 | 效果 | 图片不透明度 0–100%、模糊度 0–40px、暗化 0–60% |
-| 界面 | 界面不透明度 0–100%（默认 **65%**）。调低后各面板/侧边栏/卡片变半透明，壁纸才看得见；100% 完全恢复默认不透明外观 |
+| 界面 | 界面不透明度 0–100%（默认 **65%**）。调低后主界面（对话区/侧边栏/卡片）变半透明，壁纸才看得见；**设置面板、对话框、菜单始终保持默认清晰外观，不受这个滑块影响** |
 | 动作 | 启用 / 停用背景、移除图片、清除并重置 |
 
 所有改动**即时生效、即时保存**（参数写 localStorage，图片 Blob 写 IndexedDB）。
@@ -104,7 +104,7 @@ powershell -File E:\DSH-OneClick\scripts\launch-dsh.ps1 -Stop     # 托盘图标
 装完先自检（不需要浏览器）：
 
 ```powershell
-node tools/verify-bundle.cjs     # 84 项检查
+node tools/verify-bundle.cjs     # 87 项检查
 ```
 
 **壁纸本身不在插件里**：图片与参数存在浏览器（localStorage + IndexedDB），所以只要浏览器数据没清，
@@ -121,7 +121,7 @@ node tools/verify-bundle.cjs     # 84 项检查
 | 模块表基线（`react`） | `packages/client/web/src/platform.ts` 的 `PLATFORM_MODULES` | 基线收缩 → 把依赖写进 `package.json` 的 `dsh.client.external` |
 | 表面 token `--dsw-alias-bg-*` / `--dsw-specific-*` | `packages/client/ui-theme/src/styles/design-platform.css` | token 改名 → 改 `lib/client.js` 的 `ALPHA_FLOOR` / `SURFACE_TOKENS`（取不到值的 token 会被自动跳过并 `console.warn`，只是透明度降级，壁纸仍显示） |
 
-`tools/verify-bundle.cjs` 的 84 项检查覆盖了上面的大部分假设，升级后先跑它，红哪一项就改哪一项。
+`tools/verify-bundle.cjs` 的 87 项检查覆盖了上面的大部分假设，升级后先跑它，红哪一项就改哪一项。
 
 ---
 
@@ -142,6 +142,8 @@ node tools/verify-bundle.cjs     # 84 项检查
 
 - **需要界面半透明**：宿主 `body` 与各面板用不透明 token 绘制，插件通过覆盖这些 token 让壁纸透出。
   把「界面不透明度」拉到 100% 时壁纸基本不可见（设计使然）。
+- **弹窗永远不透明**：设置面板、对话框、菜单走 `role="dialog"` / `body > :not(#root)` 作用域，
+  始终按主题原始 alpha 绘制——任何滑块档位下文字都可读（这是刻意设计，不是缺陷）。
 - 模糊度 > 0 时壁纸层向外扩张 `3×模糊` 像素，避免模糊边缘出现硬框。
 - 动图（GIF）超过 8MB 或最长边超过 4096px 时**不压缩**（压缩会丢动画），行内会有提示。
 - 只支持单张壁纸；不含视频壁纸、多图轮播、按会话切换、配置导出/导入。
@@ -153,7 +155,7 @@ node tools/verify-bundle.cjs     # 84 项检查
 
 ```powershell
 node --check lib/client.js          # 语法
-node tools/verify-bundle.cjs        # 84 项检查（无需浏览器）
+node tools/verify-bundle.cjs        # 87 项检查（无需浏览器）
 ```
 
 `verify-bundle.cjs` 分四段：
@@ -164,7 +166,8 @@ node tools/verify-bundle.cjs        # 84 项检查（无需浏览器）
 3. **纯函数**：`computeGeometry`（cover/contain/stretch/tile、缩放与偏移夹取、永不露底）、
    `alphaFor`（各面地板 alpha）、`parseRgb`、`clamp`。
 4. **持久化全链路**（假 DOM + 假 IndexedDB/localStorage）：恢复已保存壁纸 → 生成 `/dsh-bg-layer`、
-   暗化层与 `style[data-dsh-bg-plugin]`（断言样式表在 head 末尾、表面 token 覆盖生效、`--dsh-bg-*` 变量正确）
+   暗化层与 `style[data-dsh-bg-plugin]`（断言样式表在 head 末尾、表面 token 覆盖生效、
+   **弹窗/设置作用域保持主题原始 alpha 不受滑块影响**、`--dsh-bg-*` 变量正确）
    → 渲染展开态 UI（7 个滑块、4 个布局 chip、预览框）→ 滑块写回根变量 →
    点「清除并重置」后图层/样式/变量/本地记录全部消失。
 
@@ -176,7 +179,7 @@ dsh-bg-changer/
   cordis.patch.yml        - insert: [{ id: bg-changer, name: dsh-bg-changer }]
   lib/index.js            宿主半侧：空 apply（插件行必须可导入）
   lib/client.js           全部功能（手写 lazy-CJS bundle，只 require('react')）
-  tools/verify-bundle.cjs 自检（84 项）
+  tools/verify-bundle.cjs 自检（87 项）
   tools/install.cjs       安装/卸载（幂等、可干跑、自动备份）
   安装.cmd                 Windows 双击入口 → tools/install.cjs
   README.md / 使用说明.md / LICENSE

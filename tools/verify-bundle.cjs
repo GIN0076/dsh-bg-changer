@@ -336,8 +336,8 @@ async function main() {
   near('alpha 100% is fully opaque', alphaFor(0, 1), 1)
   near('alpha 0% keeps the floor', alphaFor(0.55, 0), 0.55)
 
-  check('parseRgb opaque', JSON.stringify(parseRgb('rgb(21, 21, 23)')) === JSON.stringify({ r: 21, g: 21, b: 23 }))
-  check('parseRgb slash syntax', JSON.stringify(parseRgb('rgb(1 2 3 / 0.5)')) === JSON.stringify({ r: 1, g: 2, b: 3 }))
+  check('parseRgb opaque keeps alpha 1', JSON.stringify(parseRgb('rgb(21, 21, 23)')) === JSON.stringify({ r: 21, g: 21, b: 23, a: 1 }))
+  check('parseRgb slash syntax keeps the original alpha', JSON.stringify(parseRgb('rgb(1 2 3 / 0.5)')) === JSON.stringify({ r: 1, g: 2, b: 3, a: 0.5 }))
   check('parseRgb transparent is unresolved', parseRgb('rgba(0, 0, 0, 0)') === null)
   check('parseRgb garbage is unresolved', parseRgb('color-mix(in srgb, red, blue)') === null)
 
@@ -402,6 +402,19 @@ async function main() {
   check('stylesheet emits surface overrides', styleText.indexOf('--dsw-alias-bg-base: rgba(21, 21, 23,') !== -1
     && styleText.indexOf('--dsw-alias-bg-mask-1: rgba(21, 21, 23,') !== -1)
   check('surface alpha follows the slider', styleText.indexOf('rgba(21, 21, 23, 0.6000)') !== -1)
+  // The readability contract: dialogs/Settings/menus re-declare the probed
+  // tokens at their ORIGINAL alpha, so the slider never dims them.
+  check('overlay scopes are exempt from the slider', typeof internals.OPAQUE_SCOPE === 'string'
+    && styleText.indexOf(internals.OPAQUE_SCOPE) !== -1
+    && internals.OPAQUE_SCOPE.indexOf('[role="dialog"]') !== -1
+    && internals.OPAQUE_SCOPE.indexOf('body > :not(#root)') !== -1,
+  JSON.stringify(internals.OPAQUE_SCOPE))
+  check('overlay palette keeps the original alpha', styleText.indexOf('--dsw-alias-bg-layer-2: rgba(21, 21, 23, 1.0000)') !== -1)
+  check('the settings hint promises clear dialogs', (() => {
+    const zh = internals.TEXTS.zh['interface.hint']
+    const en = internals.TEXTS.en['interface.hint']
+    return /设置/.test(zh) && /Settings/.test(en)
+  })())
 
   const rootProps = phase2.document.documentElement.style.properties
   check('backdrop pinned to the probed theme color', rootProps['--dsh-bg-backdrop'] === 'rgb(21, 21, 23)')
