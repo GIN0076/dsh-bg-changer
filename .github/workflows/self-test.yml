@@ -1,0 +1,26 @@
+name: self-test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    name: syntax + bundle self-test
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # 零依赖、零构建：不需要 npm install / pnpm install。
+      - name: Syntax check lib/client.js
+        run: node --check lib/client.js
+
+      - name: Bundle self-test
+        run: node tools/verify-bundle.cjs

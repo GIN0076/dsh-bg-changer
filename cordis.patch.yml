@@ -1,10 +1,11 @@
-# dsh-bg-changer profile patch: one loader row for this package.
+# dsh-bg-changer profile patch: exactly one loader row for this package.
 #
-# Third-party plugins register through `insert` only: the package's own
-# `dsh.bundle.patch` manifest field makes this file a profile layer, and
-# `dsh plugin --profile web add` appends the package name to
-# `dsh.profile.bundles`. Do not also list it there by hand (duplicate
-# loader entries fail boot).
+# A third-party plugin registers through `insert` only. The package's
+# `dsh.bundle.patch` manifest field turns this file into a profile layer, and
+# the package name must appear in `dsh.profile.bundles` exactly once — either
+# appended by `dsh plugin --profile <profile> add <spec>` or by
+# `node tools/install.cjs`. Listing it twice creates duplicate loader entries
+# and fails boot.
 - insert:
     - id: bg-changer
       name: dsh-bg-changer

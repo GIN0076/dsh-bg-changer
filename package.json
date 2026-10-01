@@ -1,10 +1,31 @@
 {
   "name": "dsh-bg-changer",
-  "version": "0.1.2",
+  "version": "0.3.0",
   "private": true,
   "description": "DeepSeek Harness background wallpaper plugin: upload an image and tune fit/scale/position/opacity/blur plus interface translucency, from a row at the bottom of Settings > General.",
   "type": "module",
   "main": "lib/index.js",
+  "license": "MIT",
+  "author": "GIN0076",
+  "homepage": "https://github.com/GIN0076/dsh-bg-changer#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GIN0076/dsh-bg-changer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/GIN0076/dsh-bg-changer/issues"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "wallpaper",
+    "background",
+    "theme"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "exports": {
     ".": "./lib/index.js",
     "./client": "./lib/client.js",
@@ -12,9 +33,13 @@
   },
   "files": [
     "lib",
+    "tools",
     "cordis.patch.yml",
     "README.md",
-    "使用说明.md"
+    "使用说明.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "安装.cmd"
   ],
   "dsh": {
     "bundle": {
@@ -22,6 +47,7 @@
     },
     "client": {
       "platform": "web",
+      "immediately": true,
       "inject": [
         "@deepseek-ai/dsh-client-ui-settings",
         "@deepseek-ai/dsh-client-locale"
